@@ -1,0 +1,223 @@
+{% extends 'institute_app/base.html' %}
+{% load static %}
+
+{% block title %}تفاصيل التسجيل - {{ enrollment.student.full_name }} - {{ enrollment.course.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>تفاصيل التسجيل</h1>
+    <div>
+        <a href="{% url 'institute_app:student_detail' enrollment.student.id %}" class="btn btn-secondary me-2">العودة إلى تفاصيل الطالب</a>
+        <a href="{% url 'institute_app:course_detail' enrollment.course.id %}" class="btn btn-secondary">العودة إلى تفاصيل الدورة</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">معلومات التسجيل</h5>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <tr>
+                        <th>الطالب:</th>
+                        <td>{{ enrollment.student.rank }} {{ enrollment.student.full_name }}</td>
+                    </tr>
+                    <tr>
+                        <th>رقم البطاقة:</th>
+                        <td>{{ enrollment.student.id_card_number }}</td>
+                    </tr>
+                    <tr>
+                        <th>الدورة:</th>
+                        <td>{{ enrollment.course.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>تاريخ التسجيل:</th>
+                        <td>{{ enrollment.enrollment_date }}</td>
+                    </tr>
+                    <tr>
+                        <th>الحالة:</th>
+                        <td>
+                            {% if enrollment.is_completed %}
+                                <span class="badge bg-success">مكتملة</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">قيد التقدم</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">المستندات</h5>
+            </div>
+            <div class="card-body">
+                {% if enrollment.handwritten_report %}
+                    <div class="mb-3">
+                        <h6>تقرير بخط اليد:</h6>
+                        <img src="{{ enrollment.handwritten_report.url }}" alt="تقرير بخط اليد" class="img-fluid img-thumbnail">
+                        <a href="{{ enrollment.handwritten_report.url }}" class="btn btn-sm btn-primary mt-2" target="_blank">عرض بالحجم الكامل</a>
+                    </div>
+                {% else %}
+                    <p>لا يوجد تقرير بخط اليد.</p>
+                {% endif %}
+                
+                {% if enrollment.course_photo %}
+                    <div>
+                        <h6>صورة الدورة:</h6>
+                        <img src="{{ enrollment.course_photo.url }}" alt="صورة الدورة" class="img-fluid img-thumbnail">
+                        <a href="{{ enrollment.course_photo.url }}" class="btn btn-sm btn-primary mt-2" target="_blank">عرض بالحجم الكامل</a>
+                    </div>
+                {% else %}
+                    <p>لا توجد صورة للدورة.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <ul class="nav nav-tabs mb-4" id="gradesTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="subjects-tab" data-bs-toggle="tab" data-bs-target="#subjects" type="button" role="tab" aria-controls="subjects" aria-selected="true">درجات المواد</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="exams-tab" data-bs-toggle="tab" data-bs-target="#exams" type="button" role="tab" aria-controls="exams" aria-selected="false">درجات الاختبارات</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="projects-tab" data-bs-toggle="tab" data-bs-target="#projects" type="button" role="tab" aria-controls="projects" aria-selected="false">درجات المشاريع</button>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="gradesTabContent">
+            <div class="tab-pane fade show active" id="subjects" role="tabpanel" aria-labelledby="subjects-tab">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0">درجات المواد</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if subject_grades %}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>المادة</th>
+                                            <th>اسم الدرجة</th>
+                                            <th>الدرجة</th>
+                                            <th>الدرجة القصوى</th>
+                                            <th>النسبة المئوية</th>
+                                            <th>تاريخ الحصول</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for grade in subject_grades %}
+                                            <tr>
+                                                <td>{{ grade.subject.name }}</td>
+                                                <td>{{ grade.grade_name }}</td>
+                                                <td>{{ grade.score }}</td>
+                                                <td>{{ grade.max_score }}</td>
+                                                <td>{{ grade.score|floatformat:2|default:0 }}%</td>
+                                                <td>{{ grade.date_achieved }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                لا توجد درجات مواد مسجلة حتى الآن.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="exams" role="tabpanel" aria-labelledby="exams-tab">
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="card-title mb-0">درجات الاختبارات</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if exam_grades %}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>المادة</th>
+                                            <th>اسم الاختبار</th>
+                                            <th>الدرجة</th>
+                                            <th>الدرجة القصوى</th>
+                                            <th>النسبة المئوية</th>
+                                            <th>تاريخ الاختبار</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for grade in exam_grades %}
+                                            <tr>
+                                                <td>{{ grade.subject.name }}</td>
+                                                <td>{{ grade.grade_name }}</td>
+                                                <td>{{ grade.score }}</td>
+                                                <td>{{ grade.max_score }}</td>
+                                                <td>{{ grade.score|floatformat:2|default:0 }}%</td>
+                                                <td>{{ grade.date_achieved }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                لا توجد درجات اختبارات مسجلة حتى الآن.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="projects" role="tabpanel" aria-labelledby="projects-tab">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">درجات المشاريع</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if project_grades %}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>المادة</th>
+                                            <th>اسم المشروع</th>
+                                            <th>الدرجة</th>
+                                            <th>الدرجة القصوى</th>
+                                            <th>النسبة المئوية</th>
+                                            <th>تاريخ التسليم</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for grade in project_grades %}
+                                            <tr>
+                                                <td>{{ grade.subject.name }}</td>
+                                                <td>{{ grade.grade_name }}</td>
+                                                <td>{{ grade.score }}</td>
+                                                <td>{{ grade.max_score }}</td>
+                                                <td>{{ grade.score|floatformat:2|default:0 }}%</td>
+                                                <td>{{ grade.date_achieved }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                لا توجد درجات مشاريع مسجلة حتى الآن.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

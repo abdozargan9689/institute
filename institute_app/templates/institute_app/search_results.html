@@ -1,0 +1,81 @@
+{% extends 'institute_app/base.html' %}
+{% load static %}
+
+{% block title %}نتائج البحث - {{ query }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>نتائج البحث: "{{ query }}"</h1>
+    <a href="{% url 'institute_app:home' %}" class="btn btn-secondary">العودة إلى الصفحة الرئيسية</a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">بحث جديد</h5>
+    </div>
+    <div class="card-body">
+        <form action="{% url 'institute_app:search' %}" method="GET">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="ابحث عن طالب أو دورة..." value="{{ query }}">
+                <button class="btn btn-primary" type="submit">بحث</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if students or courses %}
+    <div class="row">
+        {% if students %}
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0">الطلاب ({{ students|length }})</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            {% for student in students %}
+                                <a href="{% url 'institute_app:student_detail' student.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ student.rank }} {{ student.full_name }}</h5>
+                                        <small>{{ student.enrollments.count }} دورة</small>
+                                    </div>
+                                    <p class="mb-1">رقم البطاقة: {{ student.id_card_number }}</p>
+                                    <small>الوحدة: {{ student.unit }}</small>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        
+        {% if courses %}
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">الدورات ({{ courses|length }})</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            {% for course in courses %}
+                                <a href="{% url 'institute_app:course_detail' course.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ course.name }}</h5>
+                                        <small>{{ course.enrollments.count }} طالب</small>
+                                    </div>
+                                    <p class="mb-1">كود الدورة: {{ course.code }}</p>
+                                    <small>من {{ course.start_date }} إلى {{ course.end_date }}</small>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        لا توجد نتائج تطابق بحثك "{{ query }}".
+    </div>
+{% endif %}
+{% endblock %}

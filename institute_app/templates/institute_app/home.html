@@ -1,0 +1,80 @@
+{% extends 'institute_app/base.html' %}
+{% load static %}
+
+{% block title %}الصفحة الرئيسية - نظام إدارة المعهد{% endblock %}
+
+{% block content %}
+<div class="jumbotron bg-light p-5 rounded">
+    <h1 class="display-4">مرحباً بك في نظام إدارة المعهد</h1>
+    <p class="lead">نظام متكامل لإدارة الطلاب والدورات والدرجات</p>
+    <hr class="my-4">
+    <p>يمكنك استخدام هذا النظام لتتبع تقدم الطلاب في الدورات المختلفة ومراقبة درجاتهم.</p>
+    <div class="d-flex gap-2">
+        <a class="btn btn-primary btn-lg" href="{% url 'institute_app:student_list' %}" role="button">عرض الطلاب</a>
+        <a class="btn btn-success btn-lg" href="{% url 'institute_app:course_list' %}" role="button">عرض الدورات</a>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card text-center mb-4">
+            <div class="card-body">
+                <h5 class="card-title">الطلاب</h5>
+                <p class="card-text display-4">{{ students_count }}</p>
+                <a href="{% url 'institute_app:student_list' %}" class="btn btn-primary">عرض الطلاب</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center mb-4">
+            <div class="card-body">
+                <h5 class="card-title">الدورات</h5>
+                <p class="card-text display-4">{{ courses_count }}</p>
+                <a href="{% url 'institute_app:course_list' %}" class="btn btn-success">عرض الدورات</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center mb-4">
+            <div class="card-body">
+                <h5 class="card-title">التسجيلات</h5>
+                <p class="card-text display-4">{{ enrollments_count }}</p>
+                <a href="#" class="btn btn-info">عرض التفاصيل</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">البحث السريع</h5>
+            </div>
+            <div class="card-body">
+                <form action="{% url 'institute_app:search' %}" method="GET">
+                    <div class="mb-3">
+                        <label for="searchQuery" class="form-label">ابحث عن طالب أو دورة</label>
+                        <input type="text" class="form-control" id="searchQuery" name="q" placeholder="اكتب اسم الطالب أو رقم البطاقة أو اسم الدورة...">
+                    </div>
+                    <button type="submit" class="btn btn-primary">بحث</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">روابط سريعة</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="{% url 'institute_app:student_list' %}" class="list-group-item list-group-item-action">قائمة الطلاب</a>
+                    <a href="{% url 'institute_app:course_list' %}" class="list-group-item list-group-item-action">قائمة الدورات</a>
+                    <a href="{% url 'admin:index' %}" class="list-group-item list-group-item-action">لوحة الإدارة</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

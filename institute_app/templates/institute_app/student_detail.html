@@ -1,0 +1,87 @@
+{% extends 'institute_app/base.html' %}
+{% load static %}
+
+{% block title %}{{ student.full_name }} - تفاصيل الطالب{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>تفاصيل الطالب</h1>
+    <a href="{% url 'institute_app:student_list' %}" class="btn btn-secondary">العودة إلى قائمة الطلاب</a>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">معلومات الطالب</h5>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <tr>
+                        <th>رقم البطاقة:</th>
+                        <td>{{ student.id_card_number }}</td>
+                    </tr>
+                    <tr>
+                        <th>الرتبة:</th>
+                        <td>{{ student.rank }}</td>
+                    </tr>
+                    <tr>
+                        <th>الاسم الكامل:</th>
+                        <td>{{ student.full_name }}</td>
+                    </tr>
+                    <tr>
+                        <th>الوحدة:</th>
+                        <td>{{ student.unit }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">الدورات المسجلة</h5>
+            </div>
+            <div class="card-body">
+                {% if enrollments %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>اسم الدورة</th>
+                                    <th>تاريخ التسجيل</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for enrollment in enrollments %}
+                                    <tr>
+                                        <td>{{ enrollment.course.name }}</td>
+                                        <td>{{ enrollment.enrollment_date }}</td>
+                                        <td>
+                                            {% if enrollment.is_completed %}
+                                                <span class="badge bg-success">مكتملة</span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark">قيد التقدم</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'institute_app:enrollment_detail' enrollment.id %}" class="btn btn-sm btn-info">عرض التفاصيل</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        لم يتم تسجيل الطالب في أي دورة حتى الآن.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
